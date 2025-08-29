@@ -5,3 +5,5 @@ python-multipart==0.0.9
 Pillow==10.3.0
 opencv-python==4.10.0.84
 ultralytics==8.3.6
+clarifai==9.8.1
+python-dotenv==1.0.1

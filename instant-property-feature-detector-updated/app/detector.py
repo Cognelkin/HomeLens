@@ -29,7 +29,7 @@ class FeatureDetector:
     def __init__(self, model_name: str = DEFAULT_MODEL, conf_threshold: float = 0.25):
         self.model = YOLO(model_name)
         self.conf_threshold = conf_threshold
-        # condition classifier (optional). If you have trained weights, place them at app/condition_classifier.pth
+        # condition classifier (optional). If you have trained weights, place them at HomeLensMain/condition_classifier.pth
         try:
             self.conditioner = ConditionClassifier()
         except Exception:

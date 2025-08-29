@@ -21,12 +21,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/frontend", StaticFiles(directory="HomeLensMain/frontend"), name="frontend")
 detector = FeatureDetector()
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    with open("app/static/index.html", "r", encoding="utf-8") as f:
+    with open("HomeLensMain/frontend/index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 @app.post("/detect", response_model=DetectResponse)

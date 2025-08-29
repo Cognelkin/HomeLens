@@ -25,7 +25,7 @@ pip install -r requirements.txt
 3) Run the server:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn HomeLensMain.main:HomeLensMain --reload
 ```
 
 4) Open the app:

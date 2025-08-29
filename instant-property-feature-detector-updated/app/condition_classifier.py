@@ -1,4 +1,4 @@
-# app/condition_classifier.py
+# HomeLensMain/condition_classifier.py
 from PIL import Image
 import numpy as np
 import cv2
