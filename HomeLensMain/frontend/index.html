@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>HomeLens - Furniture Detector</title>
+  <meta charset="UTF-8">
+  <title>Instant Property Feature Detector</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🏠 HomeLens</h1>
-  <input type="file" id="fileInput" />
-  <button onclick="uploadImage()">Analyze</button>
-  <div id="results"></div>
+  <div class="container">
+    <h1>Instant Property Feature Detector</h1>
+    <p>Upload a room/property photo. We'll detect furniture items and classify their style.</p>
+
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadImage()">Upload</button>
+
+    <div id="results"></div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

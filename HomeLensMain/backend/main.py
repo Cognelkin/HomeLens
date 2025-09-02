@@ -1,35 +1,33 @@
-from fastapi import FastAPI, File, UploadFile
+# backend/main.py
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-import cv2
 import numpy as np
-from backend.detector import detect_objects
-from backend.clarifai_client import classify_and_recommend
+import cv2
+
+from detector import detect_furniture
+from clarifai import classify_style
+from schemas import Detection, DetectionResponse
 
 app = FastAPI()
 
-# Allow frontend requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/analyze/")
-async def analyze_image(file: UploadFile = File(...)):
-    # Read image
-    image_bytes = await file.read()
-    npimg = np.frombuffer(image_bytes, np.uint8)
+@app.post("/upload", response_model=DetectionResponse)
+async def upload_image(file: UploadFile = File(...)):
+    contents = await file.read()
+    npimg = np.frombuffer(contents, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    # Step 1: Detect furniture with YOLO
-    detections = detect_objects(img)
+    detections = detect_furniture(img)
 
-    # Step 2: Send whole image (or crops) to Clarifai
-    recommendations = classify_and_recommend(image_bytes)
+    output = []
+    for det in detections:
+        style = classify_style(det["crop"])
+        output.append(Detection(item=det["label"], style=style))
 
-    return {
-        "detections": detections,
-        "recommendations": recommendations
-    }
+    return DetectionResponse(detections=output)

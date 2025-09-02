@@ -1,34 +1,44 @@
 async function uploadImage() {
   const fileInput = document.getElementById("fileInput");
   if (!fileInput.files.length) {
-    alert("Please select an image");
+    alert("Please choose an image first.");
     return;
   }
 
   const formData = new FormData();
   formData.append("file", fileInput.files[0]);
 
-  const response = await fetch("http://127.0.0.1:8000/analyze/", {
+  const res = await fetch("http://127.0.0.1:8000/upload", {
     method: "POST",
     body: formData
   });
 
-  const data = await response.json();
-  console.log(data);
+  const data = await res.json();
+  displayResults(data.detections);
+}
 
-  let html = "<h2>Detections</h2><ul>";
-  data.detections.forEach(d => {
-    html += `<li>Class ID: ${d.class_id}, Confidence: ${d.confidence.toFixed(2)}</li>`;
-  });
-  html += "</ul>";
+function displayResults(detections) {
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = "";
 
-  if (data.recommendations && data.recommendations.predictions) {
-    html += "<h2>Style Recommendations</h2><ul>";
-    data.recommendations.predictions.forEach(p => {
-      html += `<li>${p.name} (${(p.confidence*100).toFixed(1)}%)</li>`;
-    });
-    html += "</ul>";
+  if (!detections.length) {
+    resultsDiv.innerHTML = "<p>No furniture detected.</p>";
+    return;
   }
 
-  document.getElementById("results").innerHTML = html;
+  const table = document.createElement("table");
+  table.innerHTML = `
+    <tr>
+      <th>Item</th>
+      <th>Style</th>
+    </tr>
+  `;
+
+  detections.forEach(det => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${det.item}</td><td>${det.style}</td>`;
+    table.appendChild(row);
+  });
+
+  resultsDiv.appendChild(table);
 }
