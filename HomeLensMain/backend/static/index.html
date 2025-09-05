@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Instant Property Feature Detector</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Instant Property Feature Detector</h1>
+    <p>Upload a room/property photo. We'll detect features and compute a simple amenities score.</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <input type="file" id="imageInput" accept="image/*">
+      <button id="runBtn" disabled>Run Detection</button>
+      <span id="status"></span>
+    </section>
+
+    <section class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+    </section>
+
+    <section class="results">
+      <div class="score">
+        <h3>Amenities Score: <span id="score">—</span></h3>
+      </div>
+      <div>
+        <h3>Counts</h3>
+        <ul id="counts"></ul>
+      </div>
+      <div>
+        <h3>Detections</h3>
+        <table id="detTable">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Confidence</th>
+              <th>Box (x1,y1,x2,y2)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Detected Styles</h3>
+        <ul id="styles"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Powered by FastAPI + Ultralytics YOLOv8 + Clarifai. No training required.</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

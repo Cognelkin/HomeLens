@@ -1,25 +1,31 @@
-# backend/clarifai.py
 import os
 from clarifai.client.model import Model
 import cv2
 from dotenv import load_dotenv
 
 load_dotenv()
+CLARIFAI_PAT = os.getenv("CLARIFAI_PAT")
+if not CLARIFAI_PAT:
+    raise RuntimeError("Clarifai PAT not set. Please set CLARIFAI_PAT env var.")
 
-# Load Clarifai model (style recognition)
-clarifai_model = Model(
-    os.getenv("CLARIFAI_MODEL_URL"),
-    pat=os.getenv("CLARIFAI_PAT")
-)
+# Clarifai Style Model
+STYLE_MODEL_ID = "general-image-recognition"
+#STYLE_MODEL_VERSION_ID = "aa7f35c01e0642fda5cf400f543e7c40"  # optional but safer
 
-def classify_style(crop):
-    """
-    Takes a cropped furniture image (numpy array) and classifies style.
-    """
-    _, buffer = cv2.imencode(".jpg", crop)
-    crop_bytes = buffer.tobytes()
+def classify_style(image_bgr):
+    _, buf = cv2.imencode(".jpg", image_bgr)
+    img_bytes = buf.tobytes()
 
-    response = clarifai_model.predict_by_bytes(crop_bytes, input_type="image")
-    if response.outputs and response.outputs[0].data.concepts:
-        return response.outputs[0].data.concepts[0].name
-    return "Unknown"
+    # Initialize model client
+    model = Model(STYLE_MODEL_ID, pat=CLARIFAI_PAT)
+
+    # Run prediction
+    pred = model.predict_by_bytes(img_bytes, input_type="image")
+
+    styles = []
+    for concept in pred.outputs[0].data.concepts[:5]:  # top 5 predictions
+        styles.append({
+            "name": concept.name,
+            "confidence": concept.value
+        })
+    return styles
