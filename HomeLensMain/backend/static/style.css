@@ -1,0 +1,35 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  text-align: center;
+  padding: 30px;
+}
+
+.container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  max-width: 700px;
+  margin: auto;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background: #007BFF;
+  color: white;
+}

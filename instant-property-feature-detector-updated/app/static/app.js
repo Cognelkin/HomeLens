@@ -104,7 +104,8 @@ function renderDetections(data) {
     const td1 = document.createElement('td'); td1.textContent = det.label;
     const td2 = document.createElement('td'); td2.textContent = (det.confidence*100).toFixed(1) + '%';
     const td3 = document.createElement('td'); td3.textContent = det.box.map(v => v.toFixed(0)).join(', ');
-    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+    const td4 = document.createElement('td'); td4.textContent = det.condition ? (det.condition + (det.condition_score? (' ('+ (det.condition_score*100).toFixed(0) + '%)') : '')) : '—';
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
     detBody.appendChild(tr);
   }
 

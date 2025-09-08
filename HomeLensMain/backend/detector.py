@@ -77,7 +77,6 @@ class FeatureDetector:
             score += large_bonus
 
         # Normalize roughly to 0..100
-        # (heuristic cap; tweak freely)
         score = min(100.0, score * 10.0)
         return float(round(score, 2))
 
