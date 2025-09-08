@@ -9,7 +9,7 @@ if not CLARIFAI_PAT:
     raise RuntimeError("Clarifai PAT not set. Please set CLARIFAI_PAT env var.")
 
 # Clarifai Style Model
-STYLE_MODEL_ID = "general-image-recognition"
+STYLE_MODEL_ID = "https://clarifai.com/clarifai/main/models/general-image-recognition"
 #STYLE_MODEL_VERSION_ID = "aa7f35c01e0642fda5cf400f543e7c40"  # optional but safer
 
 def classify_style(image_bgr):
