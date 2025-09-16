@@ -129,3 +129,4 @@ function renderRecommendations(items) {
     recBody.appendChild(tr);
   });
 }
+
