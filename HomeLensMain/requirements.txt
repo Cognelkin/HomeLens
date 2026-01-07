@@ -1,9 +1,17 @@
-fastapi==0.111.0
-uvicorn==0.30.0
-pydantic==2.7.1
-python-multipart==0.0.9
-Pillow==10.3.0
-opencv-python==4.10.0.84
-ultralytics==8.3.6
-clarifai==9.8.1
-python-dotenv==1.0.1
+# Core
+numpy>=1.25.0
+opencv-python>=4.8.0
+Pillow>=10.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# YOLO & Ultralytics
+ultralytics>=8.0.0
+
+# PyTorch & Transformers
+torch>=2.1.0
+torchvision>=0.16.0
+transformers>=4.41.0
+
+# Optional but useful
+scipy>=1.12.0  # sometimes required by ultralytics or torch
