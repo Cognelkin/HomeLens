@@ -3,8 +3,9 @@ import os
 import time
 import requests
 import numpy as np
+from PIL import Image
 import cv2
-from typing import List, Dict, Any, Tuple
+from typing import Dict
 from ultralytics import YOLO
 from dotenv import load_dotenv
 from base64 import b64encode
@@ -32,7 +33,7 @@ CLIP_LABELS = [
     "fabric sofa",
     "sectional sofa",
     "minimalist sofa",
-    "scandinavian sofa"
+    "scandinavian sofa",
 ]
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
@@ -60,6 +61,17 @@ class FeatureDetector:
         self.ebay_endpoint = "https://api.ebay.com/buy/browse/v1/item_summary/search"
 
     # -----------------------------
+    # PUBLIC ENTRYPOINT (IMPORTANT)
+    # -----------------------------
+    def detect(self, image: Image.Image) -> Dict:
+        """
+        Unified detect method used by /detect and /shop
+        Accepts PIL Image, converts internally
+        """
+        image_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        return self.predict(image_bgr)
+
+    # -----------------------------
     # eBay OAuth
     # -----------------------------
     def _get_ebay_token(self):
@@ -76,7 +88,11 @@ class FeatureDetector:
             "scope": "https://api.ebay.com/oauth/api_scope",
         }
 
-        r = requests.post("https://api.ebay.com/identity/v1/oauth2/token", headers=headers, data=data)
+        r = requests.post(
+            "https://api.ebay.com/identity/v1/oauth2/token",
+            headers=headers,
+            data=data,
+        )
         r.raise_for_status()
 
         token_data = r.json()
@@ -107,6 +123,7 @@ class FeatureDetector:
                     continue
 
                 detections.append({
+                    "id": len(detections),
                     "label": label,
                     "confidence": float(conf),
                     "box": [float(v) for v in box],
@@ -114,15 +131,40 @@ class FeatureDetector:
 
         return detections
 
-    def crop_object(self, image, box):
+    def crop_object(self, image_bgr, box):
         x1, y1, x2, y2 = map(int, box)
-        return image[y1:y2, x1:x2]
+        return image_bgr[y1:y2, x1:x2]
+
+    # -----------------------------
+    # SHOP FOR SELECTED DETECTION
+    # -----------------------------
+    def shop_for_detection(self, image: Image.Image, detection_id: int):
+        result = self.detect(image)
+        detections = result["detections"]
+
+        if detection_id < 0 or detection_id >= len(detections):
+            raise ValueError("Invalid detection_id")
+
+        det = detections[detection_id]
+        label = det["label"]
+
+        # Simple query (you’ll enrich this later)
+        query = f"modern {label} furniture"
+
+        items = self.search_ebay(query)
+
+        return {
+            "detection_id": detection_id,
+            "label": label,
+            "query": query,
+            "items": items,
+        }
 
     # -----------------------------
     # CLIP style detection
     # -----------------------------
-    def classify_style(self, crop):
-        image_rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+    def classify_style(self, crop_bgr):
+        image_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
         inputs = self.clip_processor(
             text=CLIP_LABELS,
             images=image_rgb,
@@ -138,7 +180,7 @@ class FeatureDetector:
         return CLIP_LABELS[best_idx]
 
     # -----------------------------
-    # eBay search
+    # eBay search (Browse API)
     # -----------------------------
     def search_ebay(self, query, limit=6):
         token = self._get_ebay_token()
@@ -150,7 +192,7 @@ class FeatureDetector:
         return r.json().get("itemSummaries", [])
 
     # -----------------------------
-    # Main entry
+    # CORE PREDICTION
     # -----------------------------
     def predict(self, image_bgr: np.ndarray, selected_label: str = None):
         h, w = image_bgr.shape[:2]

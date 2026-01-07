@@ -55,11 +55,12 @@
 #         recommendations=recommendations
 #     )
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
+from PIL import Image
 import cv2
 
 from .detector import FeatureDetector
@@ -97,3 +98,17 @@ async def detect(
 
     result = detector.predict(image, selected_label)
     return result
+
+@app.post("/shop")
+async def shop(
+    image: UploadFile = File(...),
+    detection_id: int = Form(...)
+):
+    img = Image.open(image.file).convert("RGB")
+
+    try:
+        result = detector.shop_for_detection(img, detection_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
