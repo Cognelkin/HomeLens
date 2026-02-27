@@ -1,81 +1,76 @@
-# Instant Property Feature Detector
+**HomeLens**
 
-Detect common real-estate-relevant features (sofas, beds, TV, sink, toilet, refrigerator, etc.) in photos using a **pretrained YOLOv8** model—no training required. Includes a **FastAPI** backend and a **vanilla JS** single-page frontend that draws bounding boxes, tallies features, and computes a simple amenities score.
+A lightweight web application that detects real-estate-relevant features (beds, couches, TVs, sinks, toilets, refrigerators, etc.) from property photos using a pretrained YOLOv8 model.
 
-https://github.com/ultralytics/ultralytics (YOLOv8) is used via pip.
+The project includes a FastAPI backend and a minimal vanilla JavaScript frontend that renders bounding boxes, tallies detected amenities, and calculates a simple amenities score.
 
-## Quick Start
+No model training required.
 
-1) Create and activate a Python 3.9+ virtual environment.
+**Overview**
 
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-```
+This app allows users to upload a property or room image and automatically identify common household features using object detection.
 
-2) Install dependencies:
+The backend performs inference using a pretrained YOLOv8 model, and the frontend visualizes results in real time using the HTML5 Canvas API.
 
-```bash
-pip install -r requirements.txt
-```
+The goal of this project is to demonstrate:
 
-3) Run the server:
+- Applied computer vision with pretrained models
 
-```bash
-uvicorn HomeLensMain.main:HomeLensMain --reload
-```
+- Backend API design with FastAPI
 
-4) Open the app:
+- Lightweight rule-based scoring logic on top of ML outputs
 
-- Visit: **http://127.0.0.1:8000/**
+**Tech Stack**
 
-5) Try it out:
-- Upload a room/property photo (JPEG/PNG).
-- The app will display detections, counts per feature, and a simple amenities score (0–100).
+Backend
 
-## What it detects (from COCO classes)
+- FastAPI
 
-The included model (YOLOv8n by default) can detect, among many classes, the following features that are often useful for property photos:
+- Ultralytics YOLOv8 (pretrained, COCO dataset)
 
-- bed, couch (sofa), chair, dining table
-- tv
-- sink, toilet, refrigerator, oven, microwave
-- potted plant (decor), vase
-- laptop (useful if detecting "workspace" areas)
-- bathtub is not a COCO class; "toilet" often helps identify bathrooms
-- window/door are not available in COCO default; you can later swap in a model trained on those if needed.
+- PyTorch (CPU/GPU inference)
 
-The UI filters detections to a curated set of **property_features**. You can tweak this list in `app/detector.py`.
+- OpenCV (image decoding and preprocessing)
 
-## Tech Stack
+- Pydantic (response schemas)
 
-- **FastAPI** for the backend API and static file serving
-- **Ultralytics YOLOv8** (pretrained) for detection
-- **OpenCV** for basic image handling
-- **Vanilla JS** for a minimal, dependency-free frontend that draws boxes and shows analytics
+Frontend
 
-## Project Structure
+- JavaScript
 
-```
-property-feature-detector/
-├─ app/
-│  ├─ main.py          # FastAPI app & routes
-│  ├─ detector.py      # YOLO model loader & predict logic
-│  ├─ schemas.py       # Pydantic response models
-│  └─ static/
-│     ├─ index.html    # single-page front-end
-│     ├─ style.css
-│     └─ app.js
-├─ requirements.txt
-└─ README.md
-```
+- HTML5 Canvas API (bounding box rendering)
 
-## Notes
+- Minimal CSS (no frameworks)
 
-- By default this uses `yolov8n` (nano) weights for speed. You can switch to larger models
-  like `yolov8s` or `yolov8m` in `app/detector.py` for higher accuracy (at some cost to latency).
-- If you run on a GPU machine with CUDA/cuDNN installed, PyTorch will automatically accelerate inference.
-- The **amenities score** is a simple heuristic—feel free to tailor the weights or add your own rule-based logic.
+YOLOv8 is installed via pip from:
+https://github.com/ultralytics/ultralytics
+
+**How It Works**
+
+1. User uploads a JPEG or PNG image.
+
+2. The FastAPI backend:
+
+ - Loads the YOLOv8 model
+
+ - Runs object detection
+
+ - Filters detections to a curated list of property-related features
+
+3. The frontend:
+
+ - Draws bounding boxes on a canvas
+
+ - Displays counts per feature
+
+ - Computes an amenities score (0–100)
+
+ - Inference runs locally. No external vision APIs are used.
+
+**Quick Start**
+
+1. Create virtual environment: python -m venv .venv
+2. Activate virtual environment: .venv\Scripts\activate (Windows) and .venv\Scripts\activate (mac/linux)
+3. Install dependencies: pip install -r requirements.txt
+4. Start server: uvicorn HomeLensMain.main:HomeLensMain --reload
+5. Visit http://127.0.0.1:8000/
